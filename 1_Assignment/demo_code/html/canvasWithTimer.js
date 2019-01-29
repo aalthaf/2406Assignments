@@ -5,7 +5,7 @@ Javascript to handle mouse dragging and release
 to drag a string around the html canvas.
 Keyboard arrow keys are used to move a moving box around.
 
-Here we are doing all the work with javascript and jQuery. (none of the words
+Here we are doing all the work with javascript and jQuery. (none of the sentences
 are HTML, or DOM, elements. The only DOM elements are the canvas on which
 where are drawing and a text field and button where the user can type data.
 
@@ -31,13 +31,13 @@ Keyboard keyUP handler is used to trigger communication with the
 server via POST message sending JSON data
 */
 
-//Use javascript array of objects to represent words and their locations
-let words = []
-
+//Use javascript array of objects to represent sentences and their locations
+let sentences = []
+let letters =[]
 let transpose = []
 
 let notes= []
-
+let words = []
 
 let wordBeingMoved
 
@@ -58,33 +58,50 @@ function drawCanvas() {
   context.strokeStyle = 'blue'
   g = 50
 
-  for (let i = 0; i < words.length; i++) {
-    //let w = 0
-    let data = words[i]
-    //w = data.split(" ")
+  for (let i = 0; i < sentences.length; i++) {
+    let counterWord = 0;
+    let w = 50
+    let data = sentences[i]
+    tempWords = data.split(" ")
+    //console.log(tempWords)
 
-    //console.log(data.getCharAt(1))
-    context.fillText(data, 50,g );
-    context.strokeText(data,50,g )
-    //console.log("printing")
+    letters = data.split("")
+    //console.log(words)
+    for(let j = 0; j < letters.length; j++){
+      if(letters[j] == "[" ){
+        context.fillStyle = 'orange'
+        context.strokeStyle = 'orange'
+      }
 
-      g = g+ 50
+
+      context.fillText(letters[j] ,w , g)
+      context.strokeText(letters[j] , w , g)
+
+      if(letters[j] == "]"){
+        context.fillStyle = 'cornflowerblue'
+        context.strokeStyle = 'blue'
+      }
+
+
+      if(letters[j] == " "){
+        words.push({word:tempWords[counterWord], x : w , y : g})
+        w = w + context.measureText(letters[j-1]).width;
+        counterWord++
+      }else{
+        w = w + context.measureText(letters[j]).width
+      }
+
+
+    }
+    words.push({word:tempWords[counterWord], x : w , y : g})
+    g = g+ 50
   }
-
-  /*
-  for (let j = 0; j < notes.length;j++){
-    let n = notes[j]
-    context.fillStyle = "orange"
-    context.clearRect(n.x , n.y * 50 , n.x + 20 , n.y + 20)
-    context.fillText(n.word , n.x , 50 + (n.y * 50) )
-    context.strokeText(n.word , n.x , 50+ (n.y * 50))
-
-
-  }
-  */
-  //canvas.clearRect()
+  console.log(words)
   context.stroke()
 }
+
+
+
 
 function handleMouseDown(e) {
 
@@ -157,7 +174,7 @@ function handleTransposeUp() {
 }
 
 function handleTransposeDown() {
-    for (let i = 0; i< words.length ; i++){
+    for (let i = 0; i< sentences.length ; i++){
 
 
 
@@ -172,6 +189,8 @@ function handleSubmitButton() {
   const context = canvas.getContext('2d')// get context
   let textDiv = document.getElementById("text-area")
 
+  $("#text-area").empty() // clear text area if nothing was submitted
+  context.clearRect(0,0,canvas.width,canvas.height) // clear the canvas if nothing was submitted
   //scanvas.clearRect(0,0,canvas.width, canvas.height);
   if (userText && userText != '') {
 
@@ -195,13 +214,13 @@ function handleSubmitButton() {
     //  console.log(responseObj)
       //console.log(responseObj.wordArray)
     //  movingString.word = responseObj.text
-      //replace word array with new words if there are any
+      //replace word array with new sentences if there are any
       if (responseObj.wordArray) {
 
-        words = responseObj.wordArray
+        sentences = responseObj.wordArray
         //fill the text area with the current song
-        for (let i=0; i < words.length ; i++){
-          textDiv.innerHTML = textDiv.innerHTML + `<p> ${words[i]}</p>`
+        for (let i=0; i < sentences.length ; i++){
+          textDiv.innerHTML = textDiv.innerHTML + `<p> ${sentences[i]}</p>`
 
         }
 
@@ -210,9 +229,9 @@ function handleSubmitButton() {
         let ctx = canvas.getContext('2d');
         // find the notes and push them into the array containing width and the line
         let w = 0;
-        for(let j = 0 ; j< words.length;j++){
+        for(let j = 0 ; j< sentences.length;j++){
             w=50;
-            b = words[j].split(' ')
+            b = sentences[j].split(' ')
           //  console.log(b)
             for(let v =0;v<b.length;v++){
               w = w + ctx.measureText(b[v]).width + v * ctx.measureText(" ").width;
@@ -229,10 +248,6 @@ function handleSubmitButton() {
       }
 
     })
-  }else{
-      $("#text-area").empty() // clear text area if nothing was submitted
-      context.clearRect(0,0,canvas.width,canvas.height) // clear the canvas if nothing was submitted
-
   }
 
 }
@@ -242,7 +257,7 @@ $(document).ready(function() {
   //This is called after the broswer has loaded the web page
 
   //add mouse down listener to our canvas object
-//  $("#canvas1").mousedown(handleMouseDown)
+  $("#canvas1").mousedown(handleMouseDown)
 
   //add key handler for the document as a whole, not separate elements.
 //  $(document).keydown(handleKeyDown)
