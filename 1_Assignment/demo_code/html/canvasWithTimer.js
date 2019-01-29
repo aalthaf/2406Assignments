@@ -31,20 +31,117 @@ Keyboard keyUP handler is used to trigger communication with the
 server via POST message sending JSON data
 */
 
-//Use javascript array of objects to represent sentences and their locations
 let sentences = []
 let letters =[]
 let transpose = []
-
-let notes= []
+//the words array will be used to keep track of where the words are in the cavas
 let words = []
-
+//let wa  =[]
 let wordBeingMoved
 
 let deltaX, deltaY //location where mouse is pressed
 const canvas = document.getElementById('canvas1'); //our drawing canvas
 
+function getWordAtLocation(aCanvasX, aCanvasY) {
 
+  //locate the word near aCanvasX,aCanvasY
+  //Just use crude region for now.
+  //should be improved to using lenght of word etc.
+
+  //note you will have to click near the start of the word
+  //as it is implemented now
+  for (let i = 0; i < words.length; i++) {
+    if (Math.abs(words[i].x - aCanvasX) < 11 * words[i].word.length &&
+      Math.abs(words[i].y - aCanvasY) < 20) {
+        console.log(words[i])
+        return words[i]
+      }
+  //console.log(words[2].word.length)
+  return null
+  }
+}
+
+function putWordsinArray(){
+    let context = canvas.getContext('2d')
+    let wa = []
+    for (let i = 0; i < sentences.length; i++){
+      let lineWords = sentences[i].split(" ")
+      console.log(lineWords)
+      let w = 50
+      let g = 50
+      for (let j = 0; j < lineWords.length; j++){
+        if(lineWords[j].indexOf("[") >= 0){
+          //There will be four cases
+          //1. Starts with "["
+          // 2 . "[" is in the middle and word ends with "]"
+          // 3 . "[" is in middle and word doesnt end with "]"
+          // 4. The normal case where it is something like "[A]"
+          if(lineWords[j].indexOf("[") !=0 && lineWords[j].indexOf("]") !=lineWords[j].length -1){
+            let frontBracket = lineWords[j].indexOf("[")
+            let backBracket = lineWords[j].indexOf("]")
+            let sub5 = lineWords[j].substr(0,frontBracket)
+            let sub6 = lineWords[j].substr(frontBracket,backBracket- frontBracket+1)
+            let sub7 = lineWords[j].substr(backBracket+1, lineWords[j].length - 1)
+            console.log(sub5)
+            console.log(sub6)
+            console.log(sub7)
+            wa.push({word:sub5 , x : w , y: 50 + 50*i})
+            w = w + context.measureText(sub5).width + 1.5* context.measureText("A").width
+            wa.push({word:sub6,x:w,y:50+50*i})
+            w = w + context.measureText(sub6).width+ 1.5* context.measureText("A").width
+            wa.push({word:sub7,x:w,y:50+50*i})
+            w = w + context.measureText(sub7).width+ 1.5* context.measureText("A").width
+            continue
+          }
+
+          else if(lineWords[j].indexOf("]")!= lineWords[j].length - 1){
+            let sub1 = lineWords[j].substr(0,lineWords[j].indexOf("]")+1);
+            let sub2 = lineWords[j].substr(lineWords[j].indexOf("]") +1 , lineWords[j].length - 1)
+            wa.push({word:sub1 , x : w , y: 50 + 50*i})
+            w = w + context.measureText(sub1).width + 1.5* context.measureText("A").width
+            wa.push({word:sub2,x:w,y:50+50*i})
+            w = w + context.measureText(sub2).width+ 1.5* context.measureText("A").width
+            continue
+          //  console.log(sub1)
+          //  console.log(sub2)
+          }
+          else if(lineWords[j].indexOf("[") !=0 && lineWords[j].indexOf("]") == lineWords[j].length -1 ){
+            let sub3 = lineWords[j].substr(0, lineWords[j].indexOf("["))
+            let sub4 = lineWords[j].substr(lineWords[j].indexOf("[") ,lineWords[j].indexOf("]")- lineWords[j].indexOf("[") + 1)
+            //console.log(lineWords.indexOf("["))
+            wa.push({word:sub3 , x : w , y: 50 + 50*i})
+            w = w + context.measureText(sub3).width
+            wa.push({word:sub4,x:w,y:50+50*i})
+            w = w + context.measureText(sub4).width
+            //console.log(lineWords[j])
+          //  console.log(sub3)
+          //  console.log(sub4)
+          continue
+          }
+
+          else{
+            wa.push({ word: lineWords[j] , x: w , y: 50 + 50 * i})
+          }
+
+
+
+
+        }else{
+          if(lineWords[j]!= " "){
+          wa.push({word:lineWords[j], x:w , y: 50 + 50*i})
+          }
+        }
+        w = w + context.measureText(lineWords[j]).width + 3.5 * context.measureText("A").width
+      }
+
+
+    }
+    console.log(wa)
+
+
+    words = wa
+
+}
 
 function drawCanvas() {
 
@@ -56,47 +153,24 @@ function drawCanvas() {
   context.font = '12pt Arial'
   context.fillStyle = 'cornflowerblue'
   context.strokeStyle = 'blue'
-  g = 50
-
-  for (let i = 0; i < sentences.length; i++) {
-    let counterWord = 0;
-    let w = 50
-    let data = sentences[i]
-    tempWords = data.split(" ")
-    //console.log(tempWords)
-
-    letters = data.split("")
-    //console.log(words)
-    for(let j = 0; j < letters.length; j++){
-      if(letters[j] == "[" ){
-        context.fillStyle = 'orange'
-        context.strokeStyle = 'orange'
-      }
 
 
-      context.fillText(letters[j] ,w , g)
-      context.strokeText(letters[j] , w , g)
+  for (let i = 0; i < words.length; i++) {
 
-      if(letters[j] == "]"){
-        context.fillStyle = 'cornflowerblue'
-        context.strokeStyle = 'blue'
-      }
+     let data = words[i]
+     if(data.word.startsWith("[")){
+       context.fillStyle= 'orange'
+       context.strokeStyle = 'orange'
+     }else{
+       context.fillStyle = 'cornflowerblue'
+       context.strokeStyle = 'blue'
+     }
+     context.fillText(data.word, data.x, data.y);
+     context.strokeText(data.word, data.x, data.y)
 
+   }
 
-      if(letters[j] == " "){
-        words.push({word:tempWords[counterWord], x : w , y : g})
-        w = w + context.measureText(letters[j-1]).width;
-        counterWord++
-      }else{
-        w = w + context.measureText(letters[j]).width
-      }
-
-
-    }
-    words.push({word:tempWords[counterWord], x : w , y : g})
-    g = g+ 50
-  }
-  console.log(words)
+  //console.log(words)
   context.stroke()
 }
 
@@ -134,6 +208,23 @@ function handleMouseDown(e) {
   drawCanvas()
 }
 
+function handleMouseUp(e) {
+  console.log("mouse up")
+
+  e.stopPropagation()
+
+  //$("#canvas1").off(); //remove all event handlers from canvas
+  //$("#canvas1").mousedown(handleMouseDown); //add mouse down handler
+
+  //remove mouse move and mouse up handlers but leave mouse down handler
+  $("#canvas1").off("mousemove", handleMouseMove) //remove mouse move handler
+  $("#canvas1").off("mouseup", handleMouseUp) //remove mouse up handler
+
+  drawCanvas() //redraw the canvas
+}
+
+
+
 function handleMouseMove(e) {
 
   console.log("mouse move")
@@ -158,7 +249,7 @@ function handleMouseMove(e) {
 //this runs
 function handleTimer() {
 
-  drawCanvas()
+  drawWords()
 }
 
 //KEY CODES
@@ -218,6 +309,7 @@ function handleSubmitButton() {
       if (responseObj.wordArray) {
 
         sentences = responseObj.wordArray
+        putWordsinArray();
         //fill the text area with the current song
         for (let i=0; i < sentences.length ; i++){
           textDiv.innerHTML = textDiv.innerHTML + `<p> ${sentences[i]}</p>`
@@ -263,7 +355,8 @@ $(document).ready(function() {
 //  $(document).keydown(handleKeyDown)
 //  $(document).keyup(handleKeyUp)
 
-  //timer = setInterval(handleTimer, 100)
+
+//  timer = setInterval(handleTimer, 100)
   //clearTimeout(timer) //to stop
 
 
