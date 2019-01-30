@@ -32,11 +32,15 @@ server via POST message sending JSON data
 */
 
 let sentences = []
-let letters =[]
-let transpose = []
-//the words array will be used to keep track of where the words are in the cavas
+//The sentence array wil be used to store the songs where each index contain one line of the song
+
+let transpose1 = []
+let transpose2 = []
+
+
+//the words array will be used to keep track of where the words are in the canvas
 let words = []
-//let wa  =[]
+
 let wordBeingMoved
 
 let deltaX, deltaY //location where mouse is pressed
@@ -63,12 +67,13 @@ function getWordAtLocation(aCanvasX, aCanvasY) {
 
 function putWordsinArray(){
     let context = canvas.getContext('2d')
-    let wa = []
+    let tempWords = []
     for (let i = 0; i < sentences.length; i++){
       let lineWords = sentences[i].split(" ")
       console.log(lineWords)
-      let w = 50
-      let g = 50
+
+      let w = 50 // width
+      let g = 50 // height- increases by each line
       for (let j = 0; j < lineWords.length; j++){
         if(lineWords[j].indexOf("[") >= 0){
           //There will be four cases
@@ -77,69 +82,62 @@ function putWordsinArray(){
           // 3 . "[" is in middle and word doesnt end with "]"
           // 4. The normal case where it is something like "[A]"
           if(lineWords[j].indexOf("[") !=0 && lineWords[j].indexOf("]") !=lineWords[j].length -1){
+            //3rd case
             let frontBracket = lineWords[j].indexOf("[")
             let backBracket = lineWords[j].indexOf("]")
             let sub5 = lineWords[j].substr(0,frontBracket)
             let sub6 = lineWords[j].substr(frontBracket,backBracket- frontBracket+1)
             let sub7 = lineWords[j].substr(backBracket+1, lineWords[j].length - 1)
-            //console.log(sub5)
-            //console.log(sub6)
-            //console.log(sub7)
-            wa.push({word:sub5 , x : w , y: 50 + 50*i})
+            tempWords.push({word:sub5 , x : w , y: 50 + 50*i})
+            // Using context to measure A to put some space between
             w = w + context.measureText(sub5).width + 1.5* context.measureText("A").width
-            wa.push({word:sub6,x:w,y:50+50*i})
+            tempWords.push({word:sub6,x:w,y:50+50*i})
             w = w + context.measureText(sub6).width+ 1.5* context.measureText("A").width
-            wa.push({word:sub7,x:w,y:50+50*i})
+            tempWords.push({word:sub7,x:w,y:50+50*i})
             w = w + context.measureText(sub7).width+ 1.5* context.measureText("A").width
             continue
           }
 
           else if(lineWords[j].indexOf("]")!= lineWords[j].length - 1){
+            // 3rd case
             let sub1 = lineWords[j].substr(0,lineWords[j].indexOf("]")+1);
             let sub2 = lineWords[j].substr(lineWords[j].indexOf("]") +1 , lineWords[j].length - 1)
-            wa.push({word:sub1 , x : w , y: 50 + 50*i})
+            tempWords.push({word:sub1 , x : w , y: 50 + 50*i})
             w = w + context.measureText(sub1).width + 1.5* context.measureText("A").width
-            wa.push({word:sub2,x:w,y:50+50*i})
+            tempWords.push({word:sub2,x:w,y:50+50*i})
             w = w + context.measureText(sub2).width+ 1.5* context.measureText("A").width
             continue
-          //  console.log(sub1)
-          //  console.log(sub2)
+
           }
           else if(lineWords[j].indexOf("[") !=0 && lineWords[j].indexOf("]") == lineWords[j].length -1 ){
+            // 2nd case
             let sub3 = lineWords[j].substr(0, lineWords[j].indexOf("["))
             let sub4 = lineWords[j].substr(lineWords[j].indexOf("[") ,lineWords[j].indexOf("]")- lineWords[j].indexOf("[") + 1)
-            //console.log(lineWords.indexOf("["))
-            wa.push({word:sub3 , x : w , y: 50 + 50*i})
+            tempWords.push({word:sub3 , x : w , y: 50 + 50*i})
             w = w + context.measureText(sub3).width
-            wa.push({word:sub4,x:w,y:50+50*i})
+            tempWords.push({word:sub4,x:w,y:50+50*i})
             w = w + context.measureText(sub4).width
-            //console.log(lineWords[j])
-          //  console.log(sub3)
-          //  console.log(sub4)
-          continue
+            continue
           }
 
           else{
-            wa.push({ word: lineWords[j] , x: w , y: 50 + 50 * i})
+            //4th case
+            tempWords.push({ word: lineWords[j] , x: w , y: 50 + 50 * i})
           }
-
-
-
 
         }else{
           if(lineWords[j]!= " "){ // to get rid of random empty spaces
-          wa.push({word:lineWords[j], x:w , y: 50 + 50*i})
+          tempWords.push({word:lineWords[j], x:w , y: 50 + 50*i})
           }
         }
         w = w + context.measureText(lineWords[j]).width + 3.5 * context.measureText("A").width
       }
 
-
     }
-    console.log(wa)
+    console.log(tempWords)
 
 
-    words = wa
+    words = tempWords
 
 }
 
@@ -188,7 +186,7 @@ function handleMouseDown(e) {
   console.log("mouse down:" + canvasX + ", " + canvasY)
 
   wordBeingMoved = getWordAtLocation(canvasX, canvasY)
-  //console.log(wordBeingMoved.word)
+  console.log(wordBeingMoved.word)
   if (wordBeingMoved != null) {
     deltaX = wordBeingMoved.x - canvasX
     deltaY = wordBeingMoved.y - canvasY
@@ -255,10 +253,7 @@ function handleTimer() {
 //KEY CODES
 //should clean up these hard coded key codes
 const ENTER = 13
-const RIGHT_ARROW = 39
-const LEFT_ARROW = 37
-const UP_ARROW = 38
-const DOWN_ARROW = 40
+
 
 function handleTransposeUp() {
 
@@ -302,10 +297,7 @@ function handleSubmitButton() {
 
       console.log("typeof: " + typeof data)
       let responseObj = JSON.parse(data)
-    //  console.log(responseObj)
-      //console.log(responseObj.wordArray)
-    //  movingString.word = responseObj.text
-      //replace word array with new sentences if there are any
+      //replace sentence array with new sentences if there are any
       if (responseObj.wordArray) {
 
         sentences = responseObj.wordArray
@@ -315,27 +307,6 @@ function handleSubmitButton() {
           textDiv.innerHTML = textDiv.innerHTML + `<p> ${sentences[i]}</p>`
 
         }
-
-
-        /*
-        let ctx = canvas.getContext('2d');
-        // find the notes and push them into the array containing width and the line
-        let w = 0;
-        for(let j = 0 ; j< sentences.length;j++){
-            w=50;
-            b = sentences[j].split(' ')
-          //  console.log(b)
-            for(let v =0;v<b.length;v++){
-              w = w + ctx.measureText(b[v]).width + v * ctx.measureText(" ").width;
-              console.log(w)
-              if(b[v].indexOf('[') > -1){
-                notes.push({word:b[v], x: w , y:j})
-              }
-            }
-
-        }
-        */
-        //console.log(ts);
         drawCanvas();
       }
 
@@ -350,16 +321,4 @@ $(document).ready(function() {
 
   //add mouse down listener to our canvas object
   $("#canvas1").mousedown(handleMouseDown)
-
-  //add key handler for the document as a whole, not separate elements.
-//  $(document).keydown(handleKeyDown)
-//  $(document).keyup(handleKeyUp)
-
-
-  //timer = setInterval(handleTimer, 100)
-  //clearTimeout(timer) //to stop
-
-
-
-
 })
