@@ -43,22 +43,22 @@ let deltaX, deltaY //location where mouse is pressed
 const canvas = document.getElementById('canvas1'); //our drawing canvas
 
 function getWordAtLocation(aCanvasX, aCanvasY) {
-
   //locate the word near aCanvasX,aCanvasY
-  //Just use crude region for now.
-  //should be improved to using lenght of word etc.
 
-  //note you will have to click near the start of the word
-  //as it is implemented now
+
+
+  let context = canvas.getContext('2d')
+
   for (let i = 0; i < words.length; i++) {
-    if (Math.abs(words[i].x - aCanvasX) < 11 * words[i].word.length &&
+    if (Math.abs(words[i].x - aCanvasX) < context.measureText(words[i].word).width  &&
       Math.abs(words[i].y - aCanvasY) < 20) {
-        console.log(words[i])
+      //  console.log(words[i])
         return words[i]
       }
   //console.log(words[2].word.length)
-  return null
+
   }
+    return null
 }
 
 function putWordsinArray(){
@@ -82,9 +82,9 @@ function putWordsinArray(){
             let sub5 = lineWords[j].substr(0,frontBracket)
             let sub6 = lineWords[j].substr(frontBracket,backBracket- frontBracket+1)
             let sub7 = lineWords[j].substr(backBracket+1, lineWords[j].length - 1)
-            console.log(sub5)
-            console.log(sub6)
-            console.log(sub7)
+            //console.log(sub5)
+            //console.log(sub6)
+            //console.log(sub7)
             wa.push({word:sub5 , x : w , y: 50 + 50*i})
             w = w + context.measureText(sub5).width + 1.5* context.measureText("A").width
             wa.push({word:sub6,x:w,y:50+50*i})
@@ -127,7 +127,7 @@ function putWordsinArray(){
 
 
         }else{
-          if(lineWords[j]!= " "){
+          if(lineWords[j]!= " "){ // to get rid of random empty spaces
           wa.push({word:lineWords[j], x:w , y: 50 + 50*i})
           }
         }
@@ -249,7 +249,7 @@ function handleMouseMove(e) {
 //this runs
 function handleTimer() {
 
-  drawWords()
+  drawCanvas()
 }
 
 //KEY CODES
@@ -356,7 +356,7 @@ $(document).ready(function() {
 //  $(document).keyup(handleKeyUp)
 
 
-//  timer = setInterval(handleTimer, 100)
+  //timer = setInterval(handleTimer, 100)
   //clearTimeout(timer) //to stop
 
 
