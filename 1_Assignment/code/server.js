@@ -72,6 +72,8 @@ http.createServer(function(request, response) {
         console.log("USER REQUEST: " + dataObj.text)
 
 
+
+        //SOURCE url : https://medium.com/stackfame/get-list-of-all-files-in-a-directory-in-node-js-befd31677ec5
         fs.readdir(directoryPath,function(err,files){
 
           if(err){
