@@ -39,9 +39,12 @@ Exercise: if the user types the title of a song that the server has,
 const http = require("http"); //need to http
 const fs = require("fs"); //need to read static files
 const url = require("url"); //to parse url strings
-
+const path = require("path") // path to get the songs from
+const directoryPath = path.join(__dirname, 'songs')
 
 const ROOT_DIR = "html"; //dir to serve static files from
+
+let songs={}
 
 const MIME_TYPES = {
   css: "text/css",
@@ -57,16 +60,6 @@ const MIME_TYPES = {
   svg: "image/svg+xml",
   txt: "text/plain"
 }
-
-const sisterGoldenHair = fs.readFileSync('songs/Sister Golden Hair.txt').toString().split("\n")
-const peacefulEasyFeeling = fs.readFileSync('songs/PeaceFul Easy Feeling.txt').toString().split("\n")
-const brownEyedGirl = fs.readFileSync('songs/Brown Eyed Girl.txt').toString().split("\n")
-const neverMyLove = fs.readFileSync('songs/Never My Love.txt').toString().split("\n")
-
-for (let line of brownEyedGirl){
-  console.log(line)
-}
-console.log("DONE")
 
 const get_mime = function(filename) {
   //Use file extension to determine the correct response MIME type
@@ -114,12 +107,44 @@ http.createServer(function(request, response) {
         //if it exists
 
         console.log("USER REQUEST: " + dataObj.text)
-        var returnObj = {}
+
+
+        fs.readdir(directoryPath,function(err,files){
+
+          if(err){
+
+            return console.log("error:  " + err)
+
+          }
+
+          files.forEach(function(file){
+
+            if(file.substr(0,file.length - 4) == dataObj.text ){
+              //to remove the .txt and compare the wanted file name
+              var songLines =  fs.readFileSync('songs/'+file).toString().split("\n")
+              var returnObj = {}
+
+              returnObj.wordArray = songLines
+              console.log("returning data object: ", returnObj)
+              console.log("type: ", typeof returnObj)
+
+              //object to return to client
+              response.writeHead(200, { "Content-Type": MIME_TYPES["txt"] })
+              response.end(JSON.stringify(returnObj)) //send just the JSON object as plain text
+
+            }
+
+          });
+
+        });
+
+
+        /*
         if(dataObj.text == "Sister Golden Hair"){
           returnObj.wordArray = sisterGoldenHair;
 
           //responseObj.text = "Found : Sister Golden Hair"
-        }else if(dataObj.text == "PeaceFul Easy Feeling"){
+        }else if(dataObj.text == "Peaceful Easy Feeling"){
           returnObj.wordArray = peacefulEasyFeeling;
 
         }else if(dataObj.text == "Brown Eyed Girl"){
@@ -133,15 +158,10 @@ http.createServer(function(request, response) {
         }else{
 
         }
-
+        */
 
         //returnObj.wordArray = peacefulEasyFeeling;
-        console.log("returning data object: ", returnObj)
-        console.log("type: ", typeof returnObj)
 
-        //object to return to client
-        response.writeHead(200, { "Content-Type": MIME_TYPES["txt"] })
-        response.end(JSON.stringify(returnObj)) //send just the JSON object as plain text
       }
 
       if (request.method == "GET") {
