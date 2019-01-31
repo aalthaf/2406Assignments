@@ -1,39 +1,3 @@
-/*
-COMP 2406 (c) LD Nel 2018
-
-Example Server that is prepared to receive GET and POST HTTP requests.
-GET requests are handled as a request for a file.
-POST requests are expected to contain JSON data in the message body.
-*/
-
-/*
-Testing: Use browser to view pages at http://localhost:3000/example1.html
-Cntl+C in console to stop server.
-
-Application:
-When the blue cube is moved with the arrow keys, a POST message will be
-sent to the server when the arrow key is released. The POST message will
-contain a data string that is the location of the blue cube when the
-arrow key was released. The server sends back a JSON string that the client could use
-to put down a "waypoint" for where the arrow key was released.
-
-If the client types in the app's text field and presses the "Submit Request" button
-a JSON object containing the text field text is send to the
-server in a POST message.
-
-Notice in this code we attach an event listener to the request object
-to receive data that might come in in chunks -typical of a POST message.
-When the request "end" event is posted we look and see if it is a
-GET or POST message. In the event of a POST message
-the message body data is processed and a response sent back to the client.
-
-
-Exercise: if the user types the title of a song that the server has,
-  the server should send a JSON object back to the client to replace
-  the words array in the client app.
-*/
-
-
 
 //Server Code
 const http = require("http"); //need to http
@@ -136,31 +100,6 @@ http.createServer(function(request, response) {
           });
 
         });
-
-
-        /*
-        if(dataObj.text == "Sister Golden Hair"){
-          returnObj.wordArray = sisterGoldenHair;
-
-          //responseObj.text = "Found : Sister Golden Hair"
-        }else if(dataObj.text == "Peaceful Easy Feeling"){
-          returnObj.wordArray = peacefulEasyFeeling;
-
-        }else if(dataObj.text == "Brown Eyed Girl"){
-
-          returnObj.wordArray = brownEyedGirl;
-
-        }else if(dataObj.text == "Never My Love"){
-
-          returnObj.wordArray = neverMyLove;
-
-        }else{
-
-        }
-        */
-
-        //returnObj.wordArray = peacefulEasyFeeling;
-
       }
 
       if (request.method == "GET") {
