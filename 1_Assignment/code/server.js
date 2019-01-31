@@ -44,7 +44,6 @@ const directoryPath = path.join(__dirname, 'songs')
 
 const ROOT_DIR = "html"; //dir to serve static files from
 
-let songs={}
 
 const MIME_TYPES = {
   css: "text/css",
