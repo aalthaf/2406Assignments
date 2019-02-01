@@ -66,6 +66,7 @@ function getWordAtLocation(aCanvasX, aCanvasY) {
     return null
 }
 
+//This function separates the lyrics and the chords and puts them into the words array
 function putWordsinArray(){
     let context = canvas.getContext('2d')
     let tempWords = []
@@ -113,7 +114,7 @@ function putWordsinArray(){
           else if(lineWords[j].indexOf("[") !=0 && lineWords[j].indexOf("]") == lineWords[j].length -1 ){
             // 2nd case
             let sub3 = lineWords[j].substr(0, lineWords[j].indexOf("["))
-            let sub4 = lineWords[j].substr(lineWords[j].indexOf("[") ,lineWords[j].indexOf("]")- lineWords[j].indexOf("[") + 1)
+            let sub4 = lineWords[j].substr(lineWords[j].indexOf("[") , lineWords[j].indexOf("]")- lineWords[j].indexOf("[") + 1)
             tempWords.push({word:sub3 , x : w , y: 50 + 50*i})
             w = w + context.measureText(sub3).width
             tempWords.push({word:sub4,x:w,y:50+50*i})
@@ -158,6 +159,7 @@ function drawCanvas() {
 
      let data = words[i]
      if(data.word.startsWith("[")){
+       // Colour the chords differently
        context.fillStyle= chordColor
        context.strokeStyle = chordColor
      }else{
@@ -255,8 +257,8 @@ function handleTimer() {
 //should clean up these hard coded key codes
 const ENTER = 13
 
-
 function handleTransposeUp() {
+  //transpose the chords up
   for (let i = 0; i< words.length ; i++){
         for(let j=0;j< transpose1.length; j++){
           if (words[i].word.includes(transpose1[j])) {
@@ -273,8 +275,6 @@ function handleTransposeUp() {
 
 
   }
-  //console.log(words)
-
   let currentColorIndex = colours.indexOf(chordColor)
   chordColor = colours[(currentColorIndex+1)% 12]
   drawCanvas();
@@ -282,6 +282,7 @@ function handleTransposeUp() {
 
 
 function handleTransposeDown() {
+  //transpose the chords down
     for (let i = 0; i< words.length ; i++){
           for(let j=0;j< transpose1.length; j++){
             if (words[i].word.includes(transpose1[j])) {
@@ -350,8 +351,6 @@ function handleSubmitButton() {
   }
 
 }
-
-
 $(document).ready(function() {
   //This is called after the broswer has loaded the web page
 
