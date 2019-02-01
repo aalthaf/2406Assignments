@@ -65,10 +65,6 @@ http.createServer(function(request, response) {
         //object to send back to client.
         //FOR NOW EITHER JUST PASS BACK AN OBJECT
         //WITH "text" PROPERTY
-
-        //TO DO: return the words array that the client requested
-        //if it exists
-
         console.log("USER REQUEST: " + dataObj.text)
 
 
@@ -129,4 +125,4 @@ http.createServer(function(request, response) {
 
 console.log("Server Running at PORT 3000  CNTL-C to quit")
 console.log("To Test:")
-console.log("http://localhost:3000/example1.html")
+console.log("http://localhost:3000/Assignment1.html")

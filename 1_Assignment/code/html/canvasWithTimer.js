@@ -34,13 +34,14 @@ server via POST message sending JSON data
 let sentences = []
 //The sentence array wil be used to store the songs where each index contain one line of the song
 
-let transpose1 = []
-let transpose2 = []
-
+// chords and colours
+let transpose1 = ["[A]","[A#]","[B]","[C]","[C#]","[D]","[D#]","[E]","[F]","[F#]","[G]","[G#]"]
+let transpose2 = ["[A]","[Bb]","[B]","[C]","[Db]","[D]","[Eb]","[E]","[F]","[Gb]","[G]","[Ab]"]
+let colours = ["red","green","#000000","violet","#FF9900","#ff9999","	#ff99e6","#cc0099","#207b75","#cccc00","#294056","#355629"]
 
 //the words array will be used to keep track of where the words are in the canvas
 let words = []
-
+let chordColor= colours[1]
 let wordBeingMoved
 
 let deltaX, deltaY //location where mouse is pressed
@@ -157,8 +158,8 @@ function drawCanvas() {
 
      let data = words[i]
      if(data.word.startsWith("[")){
-       context.fillStyle= 'orange'
-       context.strokeStyle = 'orange'
+       context.fillStyle= chordColor
+       context.strokeStyle = chordColor
      }else{
        context.fillStyle = 'cornflowerblue'
        context.strokeStyle = 'blue'
@@ -256,16 +257,51 @@ const ENTER = 13
 
 
 function handleTransposeUp() {
+  for (let i = 0; i< words.length ; i++){
+        for(let j=0;j< transpose1.length; j++){
+          if (words[i].word.includes(transpose1[j])) {
+              words[i].word = words[i].word.replace(transpose1[j],transpose1[(j+1)% 12])
+              break;
+          }
+          if(words[i].word.includes(transpose2[j])) {
 
+              words[i].word = words[i].word.replace(transpose2[j],transpose2[(j+1) % 12])
+              break;
+          }
+
+        }
+
+
+  }
+  //console.log(words)
+
+  let currentColorIndex = colours.indexOf(chordColor)
+  chordColor = colours[(currentColorIndex+1)% 12]
+  drawCanvas();
 }
 
-function handleTransposeDown() {
-    for (let i = 0; i< sentences.length ; i++){
 
+function handleTransposeDown() {
+    for (let i = 0; i< words.length ; i++){
+          for(let j=0;j< transpose1.length; j++){
+            if (words[i].word.includes(transpose1[j])) {
+
+              words[i].word = words[i].word.replace(transpose1[j],transpose1[(j-1 + 12) % 12])
+              break;
+            }
+            if(words[i].word.includes(transpose2[j])) {
+
+              words[i].word = words[i].word.replace(transpose2[j],transpose2[(j-1 + 12) % 12])
+              break;
+            }
+
+          }
 
 
     }
-
+    let currentColorIndex = colours.indexOf(chordColor)
+    chordColor = colours[(currentColorIndex-1 + 12)% 12]
+    drawCanvas();
 }
 
 
