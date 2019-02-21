@@ -10,7 +10,4 @@ OS : Windows 8.1
 2) Visit http://localhost:3000/assignment1.html to test Assignment 1
 
 
-			Issues
-
-1)The transpose up and down does not work for chords with more than one letter name in them.
 
