@@ -1,5 +1,4 @@
-Name : Althaf Ahamed Sadique	
-Student Number : 100971479
+
 
 Node.js version number: v10.15.0
 OS : Windows 8.1
